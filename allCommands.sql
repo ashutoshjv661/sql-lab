@@ -34,3 +34,58 @@ select * from employee,department where DLOC='Hubli' and employee.did=department
 
 
 ********************************************************************************************************************
+
+/* 2nd LAB */
+
+-- IN operator 
+
+select DNAME 
+from employee,department
+where DLOC in ('Hubli');
+
+-- LIKE OPERATOR
+
+select * from department where DNAME like '_e%';
+
+select * from employee where ENAME like '%t';
+
+select * from employee where AGE like '2%';
+
+-- ACCESS ALL TABLES FROM DB
+
+select table_name from user_tables ;
+
+
+/ * Aggregate Functions */
+
+
+-- COUNT
+
+select count(*)
+from employee
+where did=2;
+
+-- AVG
+
+select avg(SALARY)
+from employee;
+
+-- AUTOCOMMIT ON 
+
+set autocommit on;
+
+-- MIN
+-- MAX
+-- SUM
+--GROUP BY
+
+select count(*)
+from employee 
+group by dname;
+
+
+Q-
+
+select count(*),max(salary)
+from employee
+where did=01;
