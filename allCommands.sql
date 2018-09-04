@@ -89,3 +89,114 @@ Q-
 select count(*),max(salary)
 from employee
 where did=01;
+
+
+
+*********** copied from KArtik
+select  dname
+from department
+where dloc in ('bgm','delhi'); 
+
+
+select  *
+from department
+where dloc not in ('bgm','delhi'); 
+
+
+select  *
+from department,employee
+where department.did=employee.did and
+dname='resrch';
+
+
+select  eid,ename,age
+from department,employee
+where department.did=employee.did and
+dname='resrch';
+
+select *
+from department d,employee e
+where d.did=e.did and
+dloc='delhi';
+
+select *
+from department d,employee e
+where d.did=e.did and
+dname='test' and salary>20000;
+
+select  eid,ename
+from employee
+order by ename desc;
+
+select  eid,ename,salary
+from employee
+order by salary desc;
+
+SELECT *
+FROM employee
+WHERE  ename LIKE  '% or %';
+
+
+select max(salary)
+from employee;
+select count(eid)
+from employee;
+select avg(salary)
+from employee;
+
+
+
+
+
+
+****************************************************************************************************
+Lab 3 Termwork 1
+
+create table publisher( pubname varchar(10),
+			addr varchar(10),
+			phno int,
+			primary key(pubname));
+
+create table book( bookid varchar(10),
+		   title varchar(10),
+		  pubname varchar(10),
+		  pubyear int,
+		 primary key(bookid),
+		 foreign key(pubname) references publisher(pubname));
+
+
+create table bookauthor( bookid varchar(10),
+		   	authorname varchar(10),
+			foreign key(bookid) references book(bookid));
+
+
+
+create table branch( branchid varchar(10),
+			branchname varchar(10),
+			baddr varchar(10),
+			primary key(branchid));
+
+create table bookcopy( bookid varchar(10),
+			branchid varchar(10),
+			noc int,
+			foreign key(bookid) references book(bookid),
+			foreign key(branchid) references branch(branchid));
+
+create table booklending( bookid varchar(10),
+			  branchid varchar(10),
+			 cardno varchar(10),
+			 dateout date,
+			  duedate date,
+			foreign key(bookid) references book(bookid),
+			foreign key(branchid) references branch(branchid));
+
+
+
+
+
+insert into publisher values ('&pubname','&addr','&phno');
+insert into book values ('&bookid','&title','&pubname','&pubyear');
+insert into bookauthor values ('&bookid','&authorname');
+insert into branch values ('&branchid','&branchname','&baddr');
+insert into bookcopy values ('&bookid','&branchid','&noc');
+insert into booklending values('&bookid','&branchid','&cardno','&dateout','&duedate');
