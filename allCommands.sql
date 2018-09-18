@@ -200,3 +200,70 @@ insert into bookauthor values ('&bookid','&authorname');
 insert into branch values ('&branchid','&branchname','&baddr');
 insert into bookcopy values ('&bookid','&branchid','&noc');
 insert into booklending values('&bookid','&branchid','&cardno','&dateout','&duedate');
+
+								
+								***********************************************************************************************
+Date : 18/9/2018
+Lab 4;  Termwork1;
+
+	select * from book;
+	select * from bookauthor;
+	select * from branch;
+	select * from publisher;
+	select * from bookcopy;
+	select * from booklending;
+	
+Queries :
+
+1.  select b.bookid,title,pubname,authorname,noc
+ from book b,bookcopy bc,bookauthor ba
+ where b.bookid=bc.bookid and b.bookid=ba.bookid;
+
+
+2. select cardno from booklending
+   where dateout between date '2017-01-01' and date '2018-06-01'
+   group by cardno
+   having count(*)>3;	
+
+3. delete from book where bookid=XXX;
+
+4.  create view yop2001 as
+	select * from book where pubyear=2001;
+
+5. create view CurAvailBooks as
+	select b.bookid,b.title,
+	((select sum(noc) from bookcopy where bookid=b.bookid) -
+	(select count(*) from booklending bl where bookid=b.bookid
+	group by bookid)) as cnt from book b;
+
+  select view_name from user_views;
+
+***************************************
+Termwork 2 ;
+Date : 18-9-18
+
+ TABLE CREATION :
+
+	create table salesman( sid varchar(10),
+				sname varvhar(10),
+				scity varchar(10),
+				commision int,
+			primary key(sid));
+	
+	create table customer( cid varchar(10),
+				cname varchar(10),
+				ccity varchar(10),
+				grade varchar(10),
+				sid varchar(10),
+			primary key(cid,sid),
+			foreign key(sid) references salesman(sid));
+	
+	create table orders( onum int,
+			     pamount int,
+		              odate date,
+			     cid varchar(10),
+			     sid varchar(10),
+		primary key(sid,cid,onum),
+		foreign key(sid) references salesman(sid),
+		foreign key(cid) references customer(cid));
+		
