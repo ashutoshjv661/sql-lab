@@ -491,4 +491,211 @@ SID        SNAME
 ---------- ----------
 s5         darshan
 // termwork 2 complete 
-*******************************************************************************************************
+********************************************************************************************************************************************************************************************************
+Termwork 3
+Date : 9-10-18
+
+Table Creation :
+
+1.
+	create table actor ( act_id varchar(10),
+		              act_name varchar(10),
+	 		act_gender varchar(10),
+		primary key(act_id));
+
+2.
+
+	create table director( dir_id varchar(10),
+			dir_name varchar(10),
+			dir_phone varchar(10),
+		primary key(dir_id));
+3.
+	create table movies( mov_id varchar(10),
+			mov_title varchar(10),
+			mov_year int,
+			dir_id varchar(10),
+			mov_lang varchar(10),
+		primary key(mov_id),
+		foreign key(dir_id) references director(dir_id));
+4. 
+	create table mov_cast( act_id varchar(10),
+			mov_id varchar(10),
+			role varchar(10),
+		primary key(act_id,mov_id),
+		foreign key(act_id) references actor(act_id),
+		foreign key(mov_id) references movies(mov_id));
+5.
+
+	create table rating( mov_id varchar(10),
+			rev_star int,
+	foreign key(mov_id) references movies(mov_id));
+	
+
+**************************************
+Inserting values :
+
+insert into actor values ('a1','charu','M');
+insert into actor values ('a2','dheeraj','M');
+insert into actor values ('a3','avinash','M');
+insert into actor values ('a4','aishwarya','F');
+insert into actor values ('a5','kevin','M');
+
+select * from actor;
+
+ACT_ID     ACT_NAME   ACT_GENDER
+----------	 ---------- 	----------
+a1         charu      	M
+a2         dheeraj    	M
+a3         avinash    	M
+a4         aishwarya  	F
+a5         kevin      	M
+
+insert into director values('d1','rgv','9919918201');
+insert into director values('d2','srk','9919293929');
+insert into director values('d3','salman','4758928376');
+insert into director values('d4','amir','9987684562');
+insert into director values('d5','karan','8897556908');
+insert into director values('d6','anuraj','9909223856');
+insert into director values('d7','hitchcock','9911223856');
+insert into director values('d8','steven s','9911223856');
+
+select * from directors;
+
+DIR_ID     DIR_NAME   DIR_PHONE
+---------- 	---------- 	----------
+d1        	 rgv        	9919918201
+d2        	 srk        	9919293929
+d3         	salman    	 4758928376
+d4        	 amir       	9987684562
+d5        	 karan     	 8897556908
+d6        	 anuraj     	9909223856
+d7      	  hitchcock  9911223856
+d8         	steven s   9911223856
+
+insert into movies values('m1','dilwale','1999','d1','hindi');
+insert into movies values('m2','tezab','1990','d2','hindi');
+insert into movies values('m3','insedous','2001','d3','eng');
+insert into movies values('m4','pk','2015','d3','hindi');
+insert into movies values('m5','piku','2016','d4','hindi');
+insert into movies values('m6','paa','2016','d5','hindi');
+insert into movies values('m7','inception','2017','d7','eng');
+insert into movies values('m8','predator','2017','d8','eng');
+
+select * from movies;
+MOV_ID     MOV_TITLE    MOV_YEAR DIR_ID     MOV_LANG
+---------- ---------- ---------- ---------- ----------
+m1       	  dilwale          1999 	d1         hindi
+m2        	 tezab            1990 	d2         hindi
+m3         	insedous         2001 	d3         eng
+m4        	 pk               2015 	d3         hindi
+m5         	piku             2016 	d4         hindi
+m6        	 paa              2016 	d5         hindi
+m7        	 inception        2017	 d7         eng
+m8        	 predator         2017	 d8         eng
+
+
+insert into rating values('m1','6');
+insert into rating values('m2','8');
+insert into rating values('m3','10');
+insert into rating values('m4','9');
+insert into rating values('m5','3');
+insert into rating values('m6','5');
+insert into rating values('m7','10');
+insert into rating values('m8','7');
+
+select * from rating;
+MOV_ID       REV_STAR
+---------- ----------
+m1                  6
+m2                  8
+m3                 10
+m4                  9
+m5                  3
+m6                  5
+m7                 10
+m8                  7
+
+insert into mov_cast values('a1','m1','d7');
+insert into mov_cast values('a1','m3','d2');
+insert into mov_cast values('a2','m2','d3');
+insert into mov_cast values('a3','m5','d4');
+insert into mov_cast values('a4','m6','d4');
+insert into mov_cast values('a5','m7','d8');
+insert into mov_cast values('a1','m8','hero');
+ACT_ID     MOV_ID     ROLE
+---------- ---------- -----
+a1       m1         d7
+a1       m3         d2
+a2       m2         d3
+a3       m5         d4
+a4       m6         d4
+a5         m7         d8
+a1          m8        hero
+*******************************************
+Queries :
+1. 
+	select mov_title from director d,movies m
+	 where d.dir_id=m.dir_id and
+ 	d.dir_name='hitchcock';
+	
+MOV_TITLE
+----------
+inception
+
+2.	select mov_title from movies m, mov_cast mc
+	where m.mov_id=mc.mov_id and 
+	mc.act_id in (select act_id from mov_cast mc group by act_id having count(*)>2);
+	
+MOV_TITLE
+----------
+dilwale
+insedous
+predator
+
+3.  	select a.act_id , a.act_name from actor a,mov_cast mc,movies m
+	where a.act_id=mc.act_id and m.mov_id=mc.mov_id
+	and mov_year<2000
+	intersect
+	select a.act_id , a.act_name from actor a,mov_cast mc,movies m
+	where a.act_id=mc.act_id and m.mov_id=mc.mov_id
+	and mov_year>2015;
+	
+ACT_ID     ACT_NAME
+---------- ----------
+a1         charu
+
+4. 	select mov_title,max(rev_star),sum(rev_star)
+	from movies m, rating r
+	where m.mov_id=r.mov_id
+	group by mov_title
+	having max(rev_star)>0
+	order by mov_title;
+
+MOV_TITLE  MAX(REV_STAR) SUM(REV_STAR)
+----------	 	------------- 	-------------
+dilwale     	           	6             6
+inception  	          	 10            10
+insedous   	      	 10            10
+paa                    	5             5
+piku                   	3             3
+pk                     	9             9
+predator               	7             7
+tezab                  	8             8
+
+5. 
+	update rating r set rev_star=5 
+	where r.mov_id in (select m.mov_id from movies m ,director d,rating r where m.mov_id=r.mov_id
+	 and d.dir_id=m.dir_id and d.dir_name='steven s' );
+MOV_ID       REV_STAR
+---------- ----------
+m1                  6
+m2                  8
+m3                 10
+m4                  9
+m5                  3
+m6                  5
+m7                 10
+m8                  5
+
+
+
