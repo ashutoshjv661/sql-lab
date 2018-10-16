@@ -697,5 +697,250 @@ m6                  5
 m7                 10
 m8                  5
 
+****************************************************************************************************************************
+Termwork 4
+Date : 16/10/18
 
+creating tables :
+
+1.
+	create table student( usn varchar(10),
+				sname varchar(20),
+				addr varchar(20),
+				phno varchar(10),
+				gen varchar(10),
+				 primary key(usn));
+
+2. 	create table semsec (
+				ssid varchar(10),
+				sem varchar(10),
+				sec varchar(10),
+			primary key(ssid));
+
+3.	create table subject( 
+				subcode varchar(10),
+				title varchar(10),
+				sem varchar(10),
+				credit varchar(10),
+				primary key(subcode));
+4. 	create table class (
+				usn varchar(10),
+				ssid varchar(10),
+			primary key(usn),
+		foreign key(usn) references student(usn),
+		foreign key(ssid) references semsec(ssid));
+
+5.
+	create table iamarks (
+				usn varchar(10),
+				subcode varchar(10),
+				ssid varchar(10),
+				test1 int,
+				test2 int,
+				test3 int,
+				finalia int,
+		primary key(usn,subcode),
+	foreign key(usn) references student(usn),
+	foreign key(subcode) references subject(subcode),
+	foreign key(ssid) references semsec(ssid));
+
+********************************************
+
+
+Inserting data :
+
+1.
+	
+	select * from student;
+
+
+USN        SNAME                ADDR                 PHNO       GEN
+---------- -------------------- -------------------- ---------- ----------
+2KL16CS001 RAKSHIT              BELAGAVI             8877881122 M
+2KL16CS002 SANKET               MANGALURU            7722829912 M
+2KL16CS003 SANTOSH              MANGALURU            7712312312 M
+2KL16CS004 SUDARSHAN            MANGALURU            8877881122 M
+2KL16CS005 ANJALI               CHENNAI              9900211201 F
+2KL16CS006 AMRUTA               CHENNAI              9923211099 M
+2KL16CS007 ASMI                 KOLKATTA             7894737377 F
+2KL16CS008 AJAY                 TUMKUR               9845091341 M
+
+
+2.
+	select * from semsec;
+insert into semsec values('ele','4','C');
+insert into semsec values('enc','4','C');
+insert into semsec values('ade','4','C');
+
+SSID       SEM        SEC
+---------- ---------- ----------
+bio        6          A
+MEC        7          B
+cse        6          B
+CHM        1          A
+CSE2       7          B
+CSE3       5          A
+CS4        5          B
+ele        4          C
+enc        4          C
+ade        4          C
+
+3. 
+	select * from class;
+
+insert into class values('2KL16CS006','ele');
+insert into class values('2KL16CS003','enc');
+insert into class values('2KL16CS008','ade');
+insert into class values('','');
+
+USN        SSID
+---------- ----------
+2KL16CS002 MEC
+2KL16CS004 CHM
+2KL16CS005 CSE2
+2KL16CS006 ele
+2KL16CS003 enc
+2KL16CS008 ade
+
+4.
+	select * from subject;
+
+SUBCODE    TITLE      SEM        CREDIT
+---------- ---------- ---------- ----------
+10CS81     ATC        6          4
+10CS82     JAVA       6          4
+10CS83     AJAVA      8          4
+10CS84     OOP        8          4
+10CS85     OS         5          4
+10CS71     CN         5          4
+10CS72     CN1        5          4
+10CS73     CN2        5          4
+10CS74     DBMS       7          4
+10CS75     MATHS      7          4
+
+5.
+
+	select * from iamarks;
+USN        SUBCODE    SSID            TEST1      TEST2      TEST3    FINALIA
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+2KL16CS002 10CS82     MEC                12         19         14
+2KL16CS004 10CS84     CHM                20         16         19
+2KL16CS005 10CS85     CSE2               15         15         12
+2KL16CS006 10CS71     CS4                19         18         20
+2KL16CS006 10CS81     CS4                15         13         26
+
+
+
+**************
+Queries :
+	
+
+1.	
+	select s.sname,s.usn from student s,
+	class c, semsec ss
+	where s.usn=c.usn and c.ssid=ss.ssid
+	and sem='4' and sec='C';
+
+
+SNAME                USN
+-------------------- ----------
+AMRUTA               2KL16CS006
+SANTOSH              2KL16CS003
+AJAY                 2KL16CS008	
+
+
+
+2.
+	select ss.sem, ss.sec, gen, count(*)
+	from student s,class c,semsec ss
+	where s.usn=c.usn and ss.ssid=c.ssid
+	group by ss.sem,ss.sec,gen;
+
+SEM        SEC        GEN          COUNT(*)
+---------- ---------- ---------- ----------
+1          A          M                   1
+4          C          M                   3
+7          B          F                   1
+7          B          M                   1
+
+
+3.
+	create view Test1M as
+	select test1 from iamarks where
+	usn='2KL16CS006';
+  
+   TEST1
+----------
+        19
+        15
+
+4.	
+	
+
+CREATE OR REPLACE PROCEDURE AVGMARKS
+IS
+CURSOR C_IAMARKS IS
+	SELECT GREATEST(TEST1,TEST2)AS A,GREATEST(TEST1,TEST3) AS B,GREATEST(TEST3,TEST2)AS C
+	FROM IAMARKS
+	WHERE FINALIA IS NULL
+	FOR UPDATE;
+	C_A INT;
+	C_B INT;
+	C_C INT;
+	C_SM INT;
+	C_AV INT;
+BEGIN
+	OPEN C_IAMARKS;
+	LOOP
+		FETCH C_IAMARKS INTO C_A,C_B,C_C;
+		EXIT WHEN C_IAMARKS %NOTFOUND;
+		IF(C_A!=C_B)THEN
+			C_SM:=C_A+C_B;
+		ELSE
+			C_SM:=C_A+C_C;
+		END IF;
+		C_AV:=C_SM/2;
+		UPDATE IAMARKS SET FINALIA=C_AV WHERE CURRENT OF C_IAMARKS;
+	END LOOP;
+	CLOSE C_IAMARKS;
+	END;
+	/
+	
+	
+Begin
+avgmarks;
+End;
+/
+
+
+select * from iamarks;
+USN        SUBCODE    SSID            TEST1      TEST2      TEST3    FINALIA
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+2KL16CS002 10CS82     MEC                12         19         14         17
+2KL16CS004 10CS84     CHM                20         16         19         20
+2KL16CS005 10CS85     CSE2               15         15         12         15
+2KL16CS006 10CS71     CS4                19         18         20         20
+2KL16CS006 10CS81     CS4                15         13         26         21
+
+
+5.
+	SELECT S.USN,SNAME,'OUTSTANDING'
+	FROM STUDENT S,SEMSEC SS,IAMARKS IA
+	WHERE S.USN=IA.USN AND SS.SSID=IA.SSID AND SS.SEM=8 AND
+	FINALIA BETWEEN 17 AND 20
+	UNION
+	SELECT S.USN,SNAME,'AVG'
+	FROM STUDENT S,SEMSEC SS,IAMARKS IA
+	WHERE S.USN=IA.USN AND SS.SSID=IA.SSID AND
+	FINALIA BETWEEN 12 AND 16
+	UNION
+	SELECT S.USN,SNAME,'WEAK'
+	FROM STUDENT S,SEMSEC SS,IAMARKS IA
+	WHERE S.USN=IA.USN AND SS.SSID=IA.SSID AND
+	FINALIA<12;
+	
+
+USN        SNAME                'OUTSTANDIN
+---------- -------------------- -----------
+2KL16CS005 ANJALI               AVG
 
