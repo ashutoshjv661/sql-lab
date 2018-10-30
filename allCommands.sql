@@ -944,3 +944,190 @@ USN        SNAME                'OUTSTANDIN
 ---------- -------------------- -----------
 2KL16CS005 ANJALI               AVG
 
+*********************************************************************************************************************************
+30/10/2018
+Termwork 5
+
+Creating tables :
+
+1.
+create table dept (
+		dno int,
+		dname varchar(10),
+		mgrssn varchar(10),
+		mgrstartdate  date,
+	primary key(dno));
+
+2.
+create table emp (
+		ssn varchar(10),
+		name varchar(10),
+		addr varchar(10),
+		sex varchar(10),
+		sal int,
+		superssn varchar(10),
+		dno int,
+	primary key(ssn),
+	foreign key(superssn) references emp(ssn),
+	foreign key(dno) references dept(dno));
+
+alter table dept add foreign key(mgrssn) references emp(ssn);
+
+3.
+create table dloc(	dno int,
+		dlocation varchar(10),
+		primary key(dno),
+		foreign key(dno) references dept(dno));
+
+4.
+create table pro(
+		pno varchar(10),
+		pname varchar(10),
+		ploc varchar(10),
+		dno int,
+		primary key(pno),
+		foreign key(dno) references dept(dno));
+5.
+create table won(
+		ssn varchar(10),
+		pno varchar(10),
+		hours int,
+		primary key(ssn,pno),
+		foreign key(ssn) references emp(ssn),
+		foreign key(pno) references pro(pno));
+
+***************************************
+inserting values
+
+
+1.dept
+ 
+	insert into dept(dno,dname,mgrstartdate) values('&dno','&dname','&mgrstartdate');
+
+	select * from dept;
+	
+  DNO DNAME      MGRSSN     MGRSTARTD
+	-------------- ---------- ---------
+    1 research 	  111        10-AUG-12
+    2 account   	 222        10-AUG-10
+    3 ai        		 333        15-APR-12
+    4 networks   	111        18-MAY-14
+    5 bigdata  	  666        21-JAN-10
+
+ update dept set mgrssn='666' where dno=5; and so on
+
+2.emp
+	
+
+	insert into emp values ('&ssn','&name','&addr','&sex','&sal','&superssn','&dno');
+SSN        NAME       ADDR       SEX               SAL SUPERSSN          DNO
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+111        raj             blr        m              700000     111                1
+222        rashmi     mys        f              400000     111               2
+333        ragavi     tum        f              800000                     3
+444        rajesh     tum        m              650000     333              3
+555        raveesh    blr        m              500000     333                3
+666        scott        eng        m              700000     444              5
+777        niganth    gub        m              200000     222              2
+888        ramya      gub        f              400000     222                 3
+999        vidya      tum        f              650000     333                3
+100        geetha     tum        f              800000                     3 
+
+3.
+	insert into dloc values('&dno','&dlocation');
+
+select * from dloc;
+    DNO DLOCATION
+------- ----------
+      1 mys
+      2 blr
+      3 gub
+      4 tum
+      5 eng
+
+4.
+	INSERT INTO PRO VALUES('&PNO','&PNAME','&PLOC',&DNO); 
+	select * from pro;
+
+PNO        PNAME      PLOC              DNO
+---------- ---------- ---------- ----------
+11        	 iot        gub                 3
+22         	text2sp    gub                 3
+33         	ipsecure   tum                 4
+44        	 traffic    blr                 5
+55         	cloud      tum                 1
+
+5.
+	insert into won values('&ssn','&pno',&hours);
+SSN        PNO             HOURS
+---------- ---------- ----------
+666        33                  4
+666        11                  2
+111        22                  3
+555        22                  2
+333        11                  4
+444        11                  6
+222        11                  2
+
+
+queries :
+
+
+1.
+	(SELECT DISTINCT PNO
+FROM PRO P, DEPT D,
+EMP E WHERE P.DNO=D.DNO AND
+SSN=MGRSSN AND
+e.NAME like 'sc%')
+UNION
+(SELECT DISTINCT P.PNO
+FROM PRO P, WON W,
+EMP E WHERE P.PNO=W.PNO AND
+W.SSN=E.SSN AND
+e.NAME like 'sc%');
+
+PNO
+----------
+11
+33
+44
+
+2.
+	select e.ssn,(sal+sal*0.1) as newsal
+	from emp e,won w,pro p
+	where e.ssn=w.ssn and w.pno=p.pno
+	and pname='iot';
+SSN            NEWSAL
+---------- ----------
+666            770000
+333            880000
+444            715000
+222            440000
+
+3.
+	SELECT SUM(SAL), MAX(SAL), MIN(SAL),
+AVG(SAL) FROM EMP E, DEPT D
+WHERE DNAME='ACCOUNTS' AND
+D.DNO=E.DNO;
+
+4.
+	select * from emp e
+	where not exists((select pno from pro p where dno=5 ) minus ( select pno from won w where e.ssn=w.ssn));
+SSN        NAME       ADDR       SEX               SAL SUPERSSN          DNO
+666        scott        eng        m              700000     444              5
+5.
+	SELECT DNO,COUNT(SSN)
+FROM EMP
+WHERE SAL>600000 AND DNO
+IN(SELECT DNO
+FROM EMP
+GROUP BY DNO
+HAVING COUNT(SSN)>5)
+GROUP BY DNO ;
+
+
+      DNO COUNT(SSN)
+---------- ----------
+         3          4
+					    
+					    
